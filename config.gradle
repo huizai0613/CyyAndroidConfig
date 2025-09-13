@@ -247,6 +247,8 @@ ext {
             timber              : "com.jakewharton.timber:timber:${versions.timber}",
             commonsCodec        : "commons-codec:commons-codec:${versions.commonsCodec}",
             annotation          : "androidx.annotation:annotation:${versions.annotation}",
-            androidanimations          : "com.daimajia.androidanimations:library:${versions.androidanimations}"
+            androidanimations          : "com.daimajia.androidanimations:library:${versions.androidanimations}",
+            utilcodex               : "com.blankj:utilcodex:${versions.utilcodex}"
+
     ]
 } 
