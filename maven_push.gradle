@@ -1,5 +1,5 @@
 apply plugin: 'maven-publish'
-apply from: 'config_maven_push.gradle'
+apply from: 'https://raw.githubusercontent.com/huizai0613/CyyAndroidConfig/refs/heads/master/config_maven_push.gradle'
 
 def getReleaseRepositoryUrl() {
     return "https://packages.aliyun.com/62bc041c98b10058fdb7e3ff/maven/repo-akguc"
