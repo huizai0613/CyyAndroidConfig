@@ -1,0 +1,110 @@
+apply plugin: 'maven-publish'
+apply from: 'config_maven_push.gradle'
+
+def getReleaseRepositoryUrl() {
+    return "https://packages.aliyun.com/62bc041c98b10058fdb7e3ff/maven/repo-akguc"
+}
+
+def getSnapshotRepositoryUrl() {
+    return "https://packages.aliyun.com/62bc041c98b10058fdb7e3ff/maven/repo-akguc"
+}
+
+def getRepositoryUsername() {
+    return '6364ac5cda874cca72ae56ec'
+}
+
+def getRepositoryPassword() {
+    return '9AFAEli08wYT'
+}
+
+def isReleasePush() {
+    return getProject().hasProperty("aarRelease") ? "true" : "false"
+}
+
+def getMvnVersion() {
+    return (isReleasePush() == "false") ? getAArVersion() : getAArVersion()
+}
+
+def getMvnDebugVersion() {
+    return getDebugAArVersion() + "-SNAPSHOT"
+}
+
+def getMvnReleaseVersion() {
+    return getReleaseAArVersion()
+}
+
+// 是否存在变体
+def hasProductFlavors() {
+    def isFlavor = false
+    android.libraryVariants.all { variant ->
+        isFlavor = !variant.flavorName.isEmpty()
+    }
+    return isFlavor
+}
+
+def getGroupId() {
+    return "com.cyy.public"
+}
+
+
+group getGroupId()
+version getMvnVersion()
+def artifactId = getModuleName()
+
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+
+                groupId = project.group
+                artifactId = artifactId
+                version = project.version
+
+                pom {
+                    name = artifactId
+                    packaging = 'aar'
+                }
+            }
+
+            debug(MavenPublication) {
+                from components.debug
+
+                groupId = project.group
+                artifactId = artifactId
+                version = getMvnDebugVersion()
+
+                pom {
+                    name = artifactId
+                    packaging = 'aar'
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = "release"
+                url = getReleaseRepositoryUrl()
+                credentials {
+                    username = getRepositoryUsername()
+                    password = getRepositoryPassword()
+                }
+            }
+
+            maven {
+                name = "snapshot"
+                url = getSnapshotRepositoryUrl()
+                credentials {
+                    username = getRepositoryUsername()
+                    password = getRepositoryPassword()
+                }
+            }
+        }
+    }
+}
+
+// 为了向后兼容，保留uploadArchives任务名称
+task uploadArchives {
+    dependsOn 'publishReleasePublicationToReleaseRepository'
+}

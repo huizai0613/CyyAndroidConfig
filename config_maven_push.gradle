@@ -1,0 +1,81 @@
+def String getAArVersion(){
+    if(getProject().hasProperty("aarVersion"))
+        return getProject().getProperties()["aarVersion"]
+    else
+        return "1.0.1"
+
+}
+
+def String getDebugAArVersion(){
+    if(getProject().hasProperty("aarDebugVersion"))
+        return getProject().getProperties()["aarDebugVersion"]
+    else
+        return "1.0.0"
+
+}
+
+def String getReleaseAArVersion(){
+    if(getProject().hasProperty("aarReleaseVersion"))
+        return getProject().getProperties()["aarReleaseVersion"]
+    else
+        return "1.0.0"
+
+}
+
+def String getModuleName() {
+    if (project.path.contains(":"))
+        return project.path.split(":")[1]
+    else
+        return ""
+}
+
+
+def String getProjectName() {
+    return getProject().getName()
+}
+
+def String getRootProjectName() {
+    if ("Android".equalsIgnoreCase(rootProject.getName()))
+        return rootProject.getRootDir().getParentFile().getName();
+    else
+        return rootProject.getName()
+}
+//属性值从local.properites中读取
+def readGradleEnvironment(String name) {
+    Propertiesproperties = new Properties()
+    FilepropertyFile = new File(rootDir.getAbsolutePath() + "/local.properties")
+    properties.load(propertyFile.newDataInputStream())
+    return properties.getProperty(name)
+}
+
+def writeGradleEnvironment() {
+    ext._build_number_file = new File('build_number.properties')
+    ext.buildNumber = _build_number_file.text.toInteger() + 1
+    _build_number_file.text = buildNumber
+}
+
+//从androidManifest.xml中获取版本号
+def getVersionNameFromManifest() {
+    defxmlFile = project.file("AndroidManifest.xml")
+    defrootManifest = new XmlSlurper().parse(xmlFile)
+    returnrootManifest['@android:versionName']
+}
+
+ext {
+    getModuleName = this.&getModuleName
+    getProjectName = this.&getProjectName
+    getRootProjectName = this.&getRootProjectName
+    getAArVersion = this.&getAArVersion
+    getDebugAArVersion = this.&getDebugAArVersion
+    getReleaseAArVersion = this.&getReleaseAArVersion
+}
+
+def getCurrBranchName(){
+    def remoteBranch = System.getenv("GIT_BRANCH")
+    if(remoteBranch != null){
+        return remoteBranch
+    }
+    // if local Branch exist, use local branch.  this is use for local uploadArchive
+    def localBranch = 'git rev-parse --abbrev-ref HEAD'.execute().text.trim()
+    if (localBranch != null && localBranch != "HEAD") return localBranch
+}
